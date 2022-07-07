@@ -38,7 +38,7 @@ class Screenshot:
     def _scroll_to_element(self, element):
         self._driver.execute_script("return arguments[0].scrollIntoView(false);", element)
 
-    def save_comment(self, url, ):
+    def save_comment(self, url, name):
         self._driver.get('https://www.reddit.com' + url)
         comment = self._driver.find_element(By.CLASS_NAME, 'Comment')
         self._scroll_to_element(comment)

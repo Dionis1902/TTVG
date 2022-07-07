@@ -31,17 +31,16 @@ class Reddit:
     def __get(self, url, params=None):
         return requests.get(url, params=params, headers={**headers, 'Authorization': f'bearer {self.__token}'})
 
-    def get_posts(self):
-        r = self.__get('https://oauth.reddit.com/r/AskReddit/hot', params={'limit': 10, 't': 'day'})
-        print(r.text)
+    def get_posts(self, subreddit='AskReddit'):
+        r = self.__get('https://oauth.reddit.com/r/{}/hot'.format(subreddit), params={'limit': 25, 't': 'day'})
+        return [i['data']['id'] for i in r.json()['data']['children']]
 
-    def get_comments(self, url):
-        r = self.__get('https://oauth.reddit.com' + url, params={'limit': 10})
+    def get_comments(self, thread_id, subreddit='AskReddit'):
+        r = self.__get('https://oauth.reddit.com/r/{}/comments/{}'.format(subreddit, thread_id), params={'limit': 10})
         comments = []
-
         for comment in r.json()[1].get('data', {}).get('children', []):
             if not comment['data'].get('body'):
                 continue
             comments.append(Post(permalink=comment['data']['permalink'], body=comment['data']['body']))
 
-        return comments
+        return comments, r.json()[0]['data']['children'][0]['data']['title']
